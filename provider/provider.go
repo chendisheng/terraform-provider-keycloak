@@ -10,7 +10,7 @@ import (
 	"github.com/mrparkers/terraform-provider-keycloak/keycloak"
 )
 
-func KeycloakProvider() *schema.Provider {
+func KeycloakProvider(client *keycloak.KeycloakClient) *schema.Provider {
 	provider := &schema.Provider{
 		DataSourcesMap: map[string]*schema.Resource{
 			"keycloak_group":                              dataSourceKeycloakGroup(),
@@ -22,6 +22,7 @@ func KeycloakProvider() *schema.Provider {
 			"keycloak_role":                               dataSourceKeycloakRole(),
 			"keycloak_user":                               dataSourceKeycloakUser(),
 			"keycloak_saml_client_installation_provider":  dataSourceKeycloakSamlClientInstallationProvider(),
+			"keycloak_saml_client":                        dataSourceKeycloakSamlClient(),
 			"keycloak_authentication_execution":           dataSourceKeycloakAuthenticationExecution(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -56,6 +57,7 @@ func KeycloakProvider() *schema.Provider {
 			"keycloak_openid_user_realm_role_protocol_mapper":            resourceKeycloakOpenIdUserRealmRoleProtocolMapper(),
 			"keycloak_openid_user_client_role_protocol_mapper":           resourceKeycloakOpenIdUserClientRoleProtocolMapper(),
 			"keycloak_openid_user_session_note_protocol_mapper":          resourceKeycloakOpenIdUserSessionNoteProtocolMapper(),
+			"keycloak_openid_script_protocol_mapper":                     resourceKeycloakOpenIdScriptProtocolMapper(),
 			"keycloak_openid_client_default_scopes":                      resourceKeycloakOpenidClientDefaultScopes(),
 			"keycloak_openid_client_optional_scopes":                     resourceKeycloakOpenidClientOptionalScopes(),
 			"keycloak_saml_client":                                       resourceKeycloakSamlClient(),
@@ -65,6 +67,7 @@ func KeycloakProvider() *schema.Provider {
 			"keycloak_generic_client_role_mapper":                        resourceKeycloakGenericClientRoleMapper(),
 			"keycloak_saml_user_attribute_protocol_mapper":               resourceKeycloakSamlUserAttributeProtocolMapper(),
 			"keycloak_saml_user_property_protocol_mapper":                resourceKeycloakSamlUserPropertyProtocolMapper(),
+			"keycloak_saml_script_protocol_mapper":                       resourceKeycloakSamlScriptProtocolMapper(),
 			"keycloak_hardcoded_attribute_identity_provider_mapper":      resourceKeycloakHardcodedAttributeIdentityProviderMapper(),
 			"keycloak_hardcoded_role_identity_provider_mapper":           resourceKeycloakHardcodedRoleIdentityProviderMapper(),
 			"keycloak_attribute_importer_identity_provider_mapper":       resourceKeycloakAttributeImporterIdentityProviderMapper(),
@@ -136,7 +139,7 @@ func KeycloakProvider() *schema.Provider {
 				Optional:    true,
 				Type:        schema.TypeInt,
 				Description: "Timeout (in seconds) of the Keycloak client",
-				DefaultFunc: schema.EnvDefaultFunc("KEYCLOAK_CLIENT_TIMEOUT", 5),
+				DefaultFunc: schema.EnvDefaultFunc("KEYCLOAK_CLIENT_TIMEOUT", 15),
 			},
 			"root_ca_certificate": {
 				Optional:    true,
@@ -159,6 +162,10 @@ func KeycloakProvider() *schema.Provider {
 	}
 
 	provider.ConfigureContextFunc = func(_ context.Context, data *schema.ResourceData) (interface{}, diag.Diagnostics) {
+		if client != nil {
+			return client, nil
+		}
+
 		url := data.Get("url").(string)
 		basePath := data.Get("base_path").(string)
 		clientId := data.Get("client_id").(string)
@@ -174,6 +181,7 @@ func KeycloakProvider() *schema.Provider {
 		var diags diag.Diagnostics
 
 		userAgent := fmt.Sprintf("HashiCorp Terraform/%s (+https://www.terraform.io) Terraform Plugin SDK/%s", provider.TerraformVersion, meta.SDKVersionString())
+
 		keycloakClient, err := keycloak.NewKeycloakClient(url, basePath, clientId, clientSecret, realm, username, password, initialLogin, clientTimeout, rootCaCertificate, tlsInsecureSkipVerify, userAgent)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{

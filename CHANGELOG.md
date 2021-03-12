@@ -1,3 +1,58 @@
+## v2.3.0 (March 1, 2021)
+
+FEATURES:
+
+- new resource: `keycloak_saml_script_protocol_mapper` ([#473](https://github.com/mrparkers/terraform-provider-keycloak/pull/473))
+
+IMPROVEMENTS:
+
+- support custom attributes in `keycloak_role` resource ([#475](https://github.com/mrparkers/terraform-provider-keycloak/pull/475))
+
+BUG FIXES:
+
+- remove mutex usage in keycloak client, which in some cases resulted in deadlock when retrieving tokens from Keycloak ([#489](https://github.com/mrparkers/terraform-provider-keycloak/pull/489))
+
+## v2.2.0 (January 23, 2021)
+
+FEATURES:
+
+- add new `keycloak_realm` attributes for handling default client scopes ([#464](https://github.com/mrparkers/terraform-provider-keycloak/pull/464))
+- new data source: `keycloak_saml_client` ([#468](https://github.com/mrparkers/terraform-provider-keycloak/pull/468))
+
+IMPROVEMENTS:
+
+- revised the configuration for the custom user federation example ([#425](https://github.com/mrparkers/terraform-provider-keycloak/pull/425))
+- increased the default http client timeout to 15 seconds ([#469](https://github.com/mrparkers/terraform-provider-keycloak/pull/469))
+
+BUG FIXES:
+
+- fix panic when using `keycloak_user` data source with invalid username ([#460](https://github.com/mrparkers/terraform-provider-keycloak/pull/460))
+- fix version handling with RedHat SSO ([#462](https://github.com/mrparkers/terraform-provider-keycloak/pull/462))
+
+## v2.1.0 (January 10, 2021)
+
+FEATURES:
+
+- new resource: `keycloak_openid_client_permissions` ([#364](https://github.com/mrparkers/terraform-provider-keycloak/pull/364))
+- new resource: `keycloak_users_permissions` ([#400](https://github.com/mrparkers/terraform-provider-keycloak/pull/400))
+- new resource: `keycloak_openid_client_script_protocol_mapper` ([#453](https://github.com/mrparkers/terraform-provider-keycloak/pull/453))
+
+IMPROVEMENTS:
+
+- add `authorization.decision_strategy` attribute to `keycloak_openid_client` resource ([#392](https://github.com/mrparkers/terraform-provider-keycloak/pull/392))
+- support `IMPORT` mode for `keycloak_ldap_group_mapper` resource ([#397](https://github.com/mrparkers/terraform-provider-keycloak/pull/397))
+- add client session length attributes to `keycloak_openid_client` resource ([#415](https://github.com/mrparkers/terraform-provider-keycloak/pull/415))
+- update to go 1.5 ([#445](https://github.com/mrparkers/terraform-provider-keycloak/pull/360))
+- add `groups_path` attribute to `keycloak_ldap_group_mapper` resource ([#436](https://github.com/mrparkers/terraform-provider-keycloak/pull/436))
+- add `authentication_flow_binding_overrides` attribute to `keycloak_saml_client` resource ([#448](https://github.com/mrparkers/terraform-provider-keycloak/pull/448))
+
+BUG FIXES:
+
+- fix inconsistent plan when enabling service account in `keycloak_openid_client` resource ([#437](https://github.com/mrparkers/terraform-provider-keycloak/pull/437))
+- fix import for `keycloak_openid_client_service_account_realm_role` resource ([#441](https://github.com/mrparkers/terraform-provider-keycloak/pull/441))
+- remove unneeded validation checks for registration attributes for `keycloak_realm` resource ([#438](https://github.com/mrparkers/terraform-provider-keycloak/pull/438))
+- allow commas in `config` attribute for `keycloak_custom_user_federation` resource ([#455](https://github.com/mrparkers/terraform-provider-keycloak/pull/455))
+
 ## v2.0.0 (September 20, 2020)
 
 BREAKING CHANGES:

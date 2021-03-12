@@ -11,7 +11,9 @@ import (
 )
 
 func TestAccKeycloakUsersPermission_basic(t *testing.T) {
-	realmName := "terraform-" + acctest.RandString(10)
+	realmName := acctest.RandomWithPrefix("tf-acc")
+	username := acctest.RandomWithPrefix("tf-acc")
+	email := acctest.RandomWithPrefix("tf-acc") + "@fakedomain.com"
 
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: testAccProviderFactories,
@@ -19,7 +21,7 @@ func TestAccKeycloakUsersPermission_basic(t *testing.T) {
 		CheckDestroy:      testAccCheckKeycloakUsersPermissionsAreDisabled(realmName),
 		Steps: []resource.TestStep{
 			{
-				Config: testKeycloakUsersPermission_basic(realmName),
+				Config: testKeycloakUsersPermission_basic(realmName, username, email),
 				Check:  testAccCheckKeycloakUsersPermissionExists("keycloak_users_permissions.my_permission"),
 			},
 			{
@@ -69,15 +71,15 @@ func testAccCheckKeycloakUsersPermissionExists(resourceName string) resource.Tes
 		policyId := authzClientView.Policies[0]
 
 		if viewScopePolicyId != policyId {
-			return fmt.Errorf("computed viewScopePolicyId %s was not equal to policyId %s", viewScopePolicyId, policyId)
+			return fmt.Errorf("computed view scope policy ID %s was not equal to %s", viewScopePolicyId, policyId)
 		}
 
 		if authzClientView.Description != viewScopeDescription {
-			return fmt.Errorf("DecisionStrategy %s was not equal to %s", authzClientView.DecisionStrategy, viewScopeDescription)
+			return fmt.Errorf("description %s was not equal to %s", authzClientView.DecisionStrategy, viewScopeDescription)
 		}
 
 		if authzClientView.DecisionStrategy != viewScopeDecisionStrategy {
-			return fmt.Errorf("DecisionStrategy %s was not equal to %s", authzClientView.DecisionStrategy, viewScopeDecisionStrategy)
+			return fmt.Errorf("decision strategy %s was not equal to %s", authzClientView.DecisionStrategy, viewScopeDecisionStrategy)
 		}
 
 		authzClientManage, err := keycloakClient.GetOpenidClientAuthorizationPermission(permissions.RealmId, realmManagementId, permissions.ScopePermissions["manage"].(string))
@@ -124,8 +126,6 @@ func testAccCheckKeycloakUsersPermissionsAreDisabled(realmId string) resource.Te
 }
 
 func getUsersPermissionsFromState(s *terraform.State, resourceName string) (*keycloak.UsersPermissions, error) {
-	keycloakClient := testAccProvider.Meta().(*keycloak.KeycloakClient)
-
 	rs, ok := s.RootModule().Resources[resourceName]
 	if !ok {
 		return nil, fmt.Errorf("resource not found: %s", resourceName)
@@ -141,7 +141,7 @@ func getUsersPermissionsFromState(s *terraform.State, resourceName string) (*key
 	return permissions, nil
 }
 
-func testKeycloakUsersPermission_basic(realmId string) string {
+func testKeycloakUsersPermission_basic(realmId, username, email string) string {
 	return fmt.Sprintf(`
 resource "keycloak_realm" "realm" {
 	realm = "%s"
@@ -152,17 +152,16 @@ data "keycloak_openid_client" "realm_management" {
 	client_id = "realm-management"
 }
 
-resource "keycloak_openid_client_permissions" "realm-management_permission" {
+resource "keycloak_openid_client_permissions" "realm_management_permission" {
 	realm_id   = keycloak_realm.realm.id
 	client_id  = data.keycloak_openid_client.realm_management.id
-	enabled    = true
 }
 
 resource "keycloak_user" "test" {
 	realm_id = keycloak_realm.realm.id
-	username = "test-user"
+	username = "%s"
 
-	email      = "test-user@fakedomain.com"
+	email      = "%s"
 	first_name = "Testy"
 	last_name  = "Tester"
 }
@@ -179,7 +178,7 @@ resource "keycloak_openid_client_user_policy" "test" {
 	decision_strategy = "UNANIMOUS"
 
 	depends_on = [
-		keycloak_openid_client_permissions.realm-management_permission,
+		keycloak_openid_client_permissions.realm_management_permission,
 	]
 }
 resource "keycloak_openid_client_user_policy" "test2" {
@@ -194,7 +193,7 @@ resource "keycloak_openid_client_user_policy" "test2" {
 	decision_strategy = "UNANIMOUS"
 
 	depends_on = [
-		keycloak_openid_client_permissions.realm-management_permission,
+		keycloak_openid_client_permissions.realm_management_permission,
 	]
 }
 
@@ -218,5 +217,5 @@ resource "keycloak_users_permissions" "my_permission" {
 		decision_strategy = "UNANIMOUS"
 	}
 }
-	`, realmId)
+	`, realmId, username, email)
 }
