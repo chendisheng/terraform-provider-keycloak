@@ -15,7 +15,7 @@ jobs:
           ignoreActions: release
           checkInterval: 30
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       - uses: actions/checkout@v2
       - name: Import GPG key
         id: import_gpg
@@ -40,5 +40,5 @@ jobs:
           version: latest
           args: release --rm-dist --release-notes=${{ steps.build_release_notes.outputs.NOTES }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
