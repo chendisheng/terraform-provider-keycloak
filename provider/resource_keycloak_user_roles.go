@@ -87,6 +87,7 @@ func resourceKeycloakUserRolesReconcile(data *schema.ResourceData, meta interfac
 
 	realmId := data.Get("realm_id").(string)
 	userId := data.Get("user_id").(string)
+	clientId := data.Get("client_id").(string)
 
 	user, err := keycloakClient.GetUser(realmId, userId)
 	if err != nil {
@@ -101,7 +102,7 @@ func resourceKeycloakUserRolesReconcile(data *schema.ResourceData, meta interfac
 
 	// get the list of currently assigned roles. Due to default realm and client roles
 	// (e.g. roles of the account client) this is probably not empty upon resource creation
-	roleMappings, err := keycloakClient.GetUserRoleMappings(realmId, userId)
+	roleMappings, err := keycloakClient.GetUserClientRoleMappings(realmId, userId, clientId)
 
 	// sort into roles we need to add and roles we need to remove
 	updates := calculateRoleMappingUpdates(tfRoles, intoRoleMapping(roleMappings))

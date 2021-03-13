@@ -12,6 +12,19 @@ func (keycloakClient *KeycloakClient) GetUserRoleMappings(realmId string, userId
 	return roleMapping, nil
 }
 
+func (keycloakClient *KeycloakClient) GetUserClientRoleMappings(realmId string, userId string, clientId string) (*RoleMapping, error) {
+	if clientId == "" {
+		return keycloakClient.GetUserRoleMappings(realmId, userId)
+	}
+	var roleMapping *RoleMapping
+	err := keycloakClient.get(fmt.Sprintf("/realms/%s/users/%s/role-mappings/clients/%s", realmId, userId, clientId), &roleMapping, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return roleMapping, nil
+}
+
 func (keycloakClient *KeycloakClient) AddRealmRolesToUser(realmId, userId string, roles []*Role) error {
 	_, _, err := keycloakClient.post(fmt.Sprintf("/realms/%s/users/%s/role-mappings/realm", realmId, userId), roles)
 
