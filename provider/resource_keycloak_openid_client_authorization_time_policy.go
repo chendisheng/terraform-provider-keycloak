@@ -1,9 +1,9 @@
 package provider
 
 import (
+	"github.com/chendisheng/terraform-provider-keycloak/keycloak"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
-	"github.com/mrparkers/terraform-provider-keycloak/keycloak"
 )
 
 func resourceKeycloakOpenidClientAuthorizationTimePolicy() *schema.Resource {

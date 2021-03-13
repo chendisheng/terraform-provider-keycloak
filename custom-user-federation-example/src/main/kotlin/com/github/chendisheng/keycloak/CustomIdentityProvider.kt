@@ -1,4 +1,4 @@
-package com.github.mrparkers.keycloak
+package com.github.chendisheng.keycloak
 
 import org.keycloak.broker.oidc.OIDCIdentityProvider
 import org.keycloak.models.KeycloakSession

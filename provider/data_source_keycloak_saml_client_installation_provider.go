@@ -3,8 +3,8 @@ package provider
 import (
 	"crypto/sha1"
 	"encoding/base64"
+	"github.com/chendisheng/terraform-provider-keycloak/keycloak"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/mrparkers/terraform-provider-keycloak/keycloak"
 )
 
 func dataSourceKeycloakSamlClientInstallationProvider() *schema.Resource {

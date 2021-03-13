@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/chendisheng/terraform-provider-keycloak/keycloak"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/mrparkers/terraform-provider-keycloak/keycloak"
 )
 
 func resourceKeycloakGenericClientRoleMapper() *schema.Resource {
